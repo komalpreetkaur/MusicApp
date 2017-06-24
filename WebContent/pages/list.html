@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Artists</title>
+  <meta charset="utf-8"></meta>
+  <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"></link>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <style type="text/css">
+  	.img-link {
+  		width: 34px;
+  		height: 34px;
+  		display: block;
+	} 
+  </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12"><h2 id="heading">Most popular artists by country</h2></div>
+        </div>
+        <hr></hr>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="search">Search by country</label>
+                    <input type="search" class="form-control" id="search" placeholder="Enter text..." required="required"></input>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary" id="search-btn">Search</button>
+                </div>
+            </div>
+            <div class="col-sm-8">
+                <div class="panel panel-info">
+                    <div class="panel-heading">Search Results</div>
+                    <div class="panel-body"></div>
+                </div>
+            </div>
+        </div> 
+    </div>
+<script type="text/javascript">
+/*<![CDATA[*/
+	$(document).ready(function() {
+		
+	    function successView(data) {
+	        $('.panel-body').empty();
+            if(data.hasOwnProperty('topartists')){
+            	data = data['topartists']['artist'];
+                var size = data.length;
+                if(data.length) {
+                	var html ='<table class="table"><tbody>';
+                	for (var i=0; i < data.length; i++) {
+                		html +='<tr><td class="name">'+ data[i].name + '</td>';
+                        for(var j = 0; j < data[i].image.length; ++j) {
+                        	if(data[i].image[j].size === 'small') {
+                        		html +='<td><a class="img-link" href="#"><img src= "'+data[i].image[j]["#text"]+'"></img></a></td>'
+                        	}
+                        }
+                        html += '</tr>';
+                	}
+                	html += '</tbody></table>';
+                } 
+            } else if (data.hasOwnProperty('error')){
+            	html = '<div class="alert alert-danger"><strong>'+data.message+'</strong></div>'
+            } else {
+            	html = '<div class="alert alert-info"><strong>No list available</strong></div>'
+            }
+            $('.panel-body').append(html);
+        }
+
+	    function errorView(jqXHR, textStatus, errorThrown) {
+	    	var html = '<div class="alert alert-danger"><strong>Error occured. Please provide valid country name</strong></div>'
+	    	$('.panel-body').empty();
+	    	$('.panel-body').append(html);
+	    }
+	    
+	    $('#search-btn').click(function(e) {
+	        e.preventDefault();
+	        var search = $('#search').val();
+	        $.ajax({
+	            type: 'GET',
+                dataType:'json',
+                url: '/MusicApp/rest/artists/search?search='+search+'&page=1&perPage=10',
+                success: successView,
+                error: errorView
+            });
+		});
+	    
+	    $('.panel-body').on('click','a.img-link', function(e) {
+	    	var clickedElement = $(this);
+	    	window.location.href = "details.html?name=" + clickedElement.parent().parent().find('.name').text();
+		});
+
+   });
+    /*]]>*/
+</script>
+</body>
+</html>
+

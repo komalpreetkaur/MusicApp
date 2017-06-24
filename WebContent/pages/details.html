@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Artists</title>
+  <meta charset="utf-8"></meta>
+  <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"></link>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12"><h2 id="heading">Artist Top Tracks</h2></div>
+        </div>
+        <hr></hr>
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="panel panel-info">
+                    <div class="panel-heading">List of Top Tracks</div>
+                    <div class="panel-body"></div>
+                </div>
+            </div>
+        </div> 
+    </div>
+<script type="text/javascript">
+/*<![CDATA[*/
+	$(document).ready(function() {
+		
+		function getUrlParameter(name) {
+		    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+		    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+		    var results = regex.exec(window.location.search);
+		    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+		};
+		
+	    function successView(data) {
+	        $('.panel-body').empty();
+            if(data.hasOwnProperty('toptracks')){
+            	data = data['toptracks']['track'];
+                if(data.length) {
+                	var html ='<table class="table"><tbody>';
+                	for (var i=0; i < data.length; i++) {
+                		html +='<tr class="name"><td>'+ data[i].name + '</td></tr>';
+                	}
+                	html += '</tbody></table>';
+                } 
+            } else if (data.hasOwnProperty('error')){
+            	html = '<div class="alert alert-danger"><strong>'+data.message+'</strong></div>'
+            } else {
+            	html = '<div class="alert alert-info"><strong>No list available</strong></div>'
+            }
+            $('.panel-body').append(html);
+        }
+
+	    function errorView(jqXHR, textStatus, errorThrown) {
+	    	var html = '<div class="alert alert-danger"><strong>Error occured. Please provide valid country name</strong></div>'
+	    	$('.panel-body').empty();
+	    	$('.panel-body').append(html);
+	    }
+	    
+	    $.ajax({
+            type: 'GET',
+            dataType:'json',
+            url: '/MusicApp/rest/artists/artist?artist='+getUrlParameter("name"),
+            success: successView,
+            error: errorView
+        });
+
+   });
+    /*]]>*/
+</script>
+</body>
+</html>
+
